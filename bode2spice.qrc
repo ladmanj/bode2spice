@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/copy.png</file>
+        <file>images/cut.png</file>
+        <file>images/new.png</file>
+        <file>images/open.png</file>
+        <file>images/paste.png</file>
+        <file>images/save.png</file>
+        <file>images/exportZ.png</file>
+        <file>images/exportTf.png</file>
+        <file>templates/Z.sub</file>
+        <file>templates/Z.asy</file>
+        <file>templates/Tf.asy</file>
+        <file>templates/Tf.sub</file>
+        <file>images/bode2spice.svg</file>
+    </qresource>
+</RCC>

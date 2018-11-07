@@ -1,0 +1,7 @@
+* Copyright © Jakub Ladman All rights reserved.
+*
+.subckt MODELNAME 1 2
+* (Freq, mag, deg)
+B1 1 2  I=V(1,2) DB FREQ=
+MODELDEF
+.ends MODELNAME
