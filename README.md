@@ -9,7 +9,7 @@ To build it follow this steps:
 
     mkdir build_directory
     cd build_directory
-    qmake bode2spice.pro
+    qmake ../bode2spice.pro
     make
     
 Subdirectory data_example contains one input file example.csv, sample output files and a test schematic in LTSpice format which uses the components/models. You can see how the interaction works.
