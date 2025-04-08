@@ -5,6 +5,8 @@ For a Windows binary go to the releases to the right here on github.
 
 It uses Qt5 https://www.qt.io/ and QCustomplot https://www.qcustomplot.com/ libraries.
 
+Everyone else must build it from sources.
+
 Qt must be installed on your system as a prerequisite, QCustomplot sources are included here.
 
 To build it follow this steps:
