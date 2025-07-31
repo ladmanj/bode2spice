@@ -72,13 +72,15 @@ private:
     bool maybeSave();
     void setCurrentFile(const QString &fileName);
     void preparePlot();
-    bool exportModel(const QString &symTemplate, const QString &subTemplate, const bool inverse = false);
+    bool exportModel(const QString &symTemplate,
+                     const QString &subTemplate,
+                     const bool inverse = false);
 
     QPlainTextEdit *textEdit;
     QCustomPlot *plot;
     QString curFile;
 
-    int  headerLen;
+    int headerLen;
     char delimiter;
     bool impedance;
 
@@ -87,7 +89,6 @@ private:
     QSpinBox *headerSpinBox;
     QLineEdit *delmEdit;
     QPushButton *impButton;
-
 };
 
 #endif

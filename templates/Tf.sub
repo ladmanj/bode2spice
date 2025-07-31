@@ -1,4 +1,4 @@
-* Copyright © Jakub Ladman All rights reserved.
+* Created with https://github.com/ladmanj/bode2spice
 *
 .subckt MODELNAME 1 2 3 4
 * (Freq, mag, deg)

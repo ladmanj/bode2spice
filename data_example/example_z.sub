@@ -1,6 +1,7 @@
-* Copyright © Jakub Ladman All rights reserved.
+* Created with https://github.com/ladmanj/bode2spice
 *
 .subckt example_z 1 2
+R1 1 2 100G
 * (Freq, mag, deg)
 B1 1 2  I=V(1,2) DB FREQ=
 + (100.000, -2.357, -26.700)

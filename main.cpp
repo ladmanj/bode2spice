@@ -19,10 +19,9 @@
 
 ****************************************************************************/
 
-
 #include <QApplication>
-#include <QCommandLineParser>
 #include <QCommandLineOption>
+#include <QCommandLineParser>
 
 #include "mainwindow.h"
 
@@ -48,4 +47,3 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/bode2spice.svg"));
     return app.exec();
 }
-

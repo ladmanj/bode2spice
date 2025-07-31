@@ -19,11 +19,11 @@
 
 ****************************************************************************/
 
-#include <QtWidgets>
-#include <QByteArray>
-#include <QTextCodec>
-#include <QSizePolicy>
 #include "mainwindow.h"
+#include <QByteArray>
+#include <QSizePolicy>
+#include <QTextCodec>
+#include <QtWidgets>
 
 MainWindow::MainWindow()
     : plot(new QCustomPlot)
@@ -39,7 +39,6 @@ MainWindow::MainWindow()
 
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
-
 }
 
 void MainWindow::preparePlot()
@@ -50,12 +49,12 @@ void MainWindow::preparePlot()
     plot->xAxis->setLabel(tr("Frequency [Hz]"));
     plot->yAxis->setLabel(tr("Magnitude [dB]"));
     plot->yAxis2->setLabel(tr("Phase [°]"));
-    plot->xAxis->setRange(10,100e6);
-    plot->yAxis->setRange(-50,+50);
-    plot->yAxis2->setRange(-200,+200);
+    plot->xAxis->setRange(10, 100e6);
+    plot->yAxis->setRange(-50, +50);
+    plot->yAxis2->setRange(-200, +200);
     plot->yAxis2->setVisible(true);
     plot->xAxis->setScaleType(QCPAxis::stLogarithmic);
-//    plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+    //    plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
     plot->yAxis->setScaleType(QCPAxis::stLinear);
     plot->yAxis2->setScaleType(QCPAxis::stLinear);
     QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
@@ -64,7 +63,6 @@ void MainWindow::preparePlot()
     plot->xAxis->setNumberPrecision(0);
     plot->replot();
 }
-
 
 void MainWindow::closeEvent(QCloseEvent *event)
 
@@ -89,33 +87,29 @@ void MainWindow::open()
 QString MainWindow::getSpiceModelString(const bool inverse)
 {
     QString spiceModelString;
-    double mag,pha,re,im;
-    for(int i=0;i<input_data.size();i++)
-    {
-
+    double mag, pha, re, im;
+    for (int i = 0; i < input_data.size(); i++) {
         re = input_data[i].real;
         im = input_data[i].imag;
 
-        mag   =  (sqrt(re*re+im*im));
+        mag = (sqrt(re * re + im * im));
 
-        if(qIsNull(mag))
-        {
+        if (qIsNull(mag)) {
             //mark both positive and negative infinity as skipped value
             spiceModelString.append(QString("* skipped "));
         }
 
+        mag = (inverse ? 1.0 / mag : mag);
+        pha = (inverse ? -1.0 : 1.0) * qRadiansToDegrees(qAtan2(im, re));
 
-        mag   =  (inverse ?  1.0/mag : mag);
-        pha   =  (inverse ? -1.0 : 1.0) * qRadiansToDegrees(qAtan2(im,re));
-
-        mag = 20*log10(mag);
+        mag = 20 * log10(mag);
 
         spiceModelString.append(QString("+ (%1, %2, %3)")
-            .arg(input_data[i].freq,0,'f',3)
-            .arg(mag,0,'f',3)
-            .arg(pha,0,'f',3));
+                                    .arg(input_data[i].freq, 0, 'f', 3)
+                                    .arg(mag, 0, 'f', 3)
+                                    .arg(pha, 0, 'f', 3));
 
-        if(i<(input_data.size()-1))
+        if (i < (input_data.size() - 1))
             spiceModelString.append(QString("\n"));
     }
     return spiceModelString;
@@ -123,18 +117,19 @@ QString MainWindow::getSpiceModelString(const bool inverse)
 
 bool MainWindow::exportZ()
 {
-    return exportModel(":/templates/Z.asy",":/templates/Z.sub",true);
+    return exportModel(":/templates/Z.asy", ":/templates/Z.sub", true);
 }
 
 bool MainWindow::exportTf()
 {
-    return exportModel(":/templates/Tf.asy",":/templates/Tf.sub");
+    return exportModel(":/templates/Tf.asy", ":/templates/Tf.sub");
 }
 
-bool MainWindow::exportModel(const QString &symTemplate, const QString &subTemplate, const bool inverse)
+bool MainWindow::exportModel(const QString &symTemplate,
+                             const QString &subTemplate,
+                             const bool inverse)
 {
-    if(input_data.isEmpty())
-    {
+    if (input_data.isEmpty()) {
         statusBar()->showMessage(tr("No data"), 2000);
         return false;
     }
@@ -143,13 +138,12 @@ bool MainWindow::exportModel(const QString &symTemplate, const QString &subTempl
     QFile file(symTemplate);
 
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read template."));
+        QMessageBox::warning(this, tr("Application"), tr("Cannot read template."));
         return false;
     }
 
     fileData = file.readAll(); // read all the data into the byte array
-    file.close(); // close the file handle
+    file.close();              // close the file handle
 
     QString text(codec->toUnicode(fileData)); // add to text string for easy string replace
 
@@ -164,7 +158,7 @@ bool MainWindow::exportModel(const QString &symTemplate, const QString &subTempl
     if (dialog.exec() != QDialog::Accepted)
         return false;
 
-    QString filename = dialog.selectedFiles().first();
+    QString filename = dialog.selectedFiles().constFirst();
 
     QString path = QFileInfo(filename).path();
     QString base = QFileInfo(filename).baseName();
@@ -172,10 +166,11 @@ bool MainWindow::exportModel(const QString &symTemplate, const QString &subTempl
     file.setFileName(path + "/" + base + ".asy");
 
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this,
+                             tr("Application"),
                              tr("Cannot write file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(file.fileName()),
-                                  file.errorString()));
+                                 .arg(QDir::toNativeSeparators(file.fileName()),
+                                      file.errorString()));
         return false;
     }
 
@@ -187,56 +182,53 @@ bool MainWindow::exportModel(const QString &symTemplate, const QString &subTempl
     file.setFileName(subTemplate);
 
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read template."));
+        QMessageBox::warning(this, tr("Application"), tr("Cannot read template."));
         return false;
     }
 
     fileData = file.readAll(); // read all the data into the byte array
-    file.close(); // close the file handle
+    file.close();              // close the file handle
 
     text = codec->toUnicode(fileData);
 
     file.setFileName(path + "/" + base + ".sub");
 
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this,
+                             tr("Application"),
                              tr("Cannot write file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(file.fileName()),
-                                  file.errorString()));
+                                 .arg(QDir::toNativeSeparators(file.fileName()),
+                                      file.errorString()));
         return false;
     }
 
-    text.replace(QString("MODELNAME"), base); // replace text in string
+    text.replace(QString("MODELNAME"), base);                        // replace text in string
     text.replace(QString("MODELDEF"), getSpiceModelString(inverse)); //insert bode data
 
     file.write(codec->fromUnicode(text));
     file.close(); // close the file handle
 
     statusBar()->showMessage(tr("Model exported"), 2000);
-  return true;
+    return true;
 }
-
 
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About Application"),
-            tr("The <b>bode2spice</b> tool reads data "
-               "from Comma Separated Values file, exported by the Omicron Labs "
-               "Bode Analyzer Suite or similar source, containing complex impedance "
-               "or transfer function, plots it for inspection and generates "
-               "LTSpice compatible component to ease embedding into simulation."));
+    QMessageBox::about(this,
+                       tr("About Application"),
+                       tr("The <b>bode2spice</b> tool reads data "
+                          "from Comma Separated Values file, exported by the Omicron Labs "
+                          "Bode Analyzer Suite or similar source containing complex impedance "
+                          "or transfer function, plots it for inspection and generates "
+                          "LTSpice compatible component to ease embedding into simulation."));
 }
 
 void MainWindow::setDelimiter(const QString cdata)
 {
     QByteArray ba = cdata.toLocal8Bit();
-    if(*ba.data() != 0)
-    {
+    if (*ba.data() != 0) {
         delimiter = *ba.data();
-    }
-    else
-    {
+    } else {
         delmEdit->setText(QString(delimiter));
     }
 }
@@ -248,7 +240,6 @@ void MainWindow::setHeadLen(const int num)
 
 void MainWindow::createActions()
 {
-
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
 
@@ -262,7 +253,8 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
 
-    const QIcon exportZIcon = /*QIcon::fromTheme("document-export", */QIcon(":/images/exportZ.png"/*)*/);
+    const QIcon exportZIcon = /*QIcon::fromTheme("document-export", */ QIcon(
+        ":/images/exportZ.png" /*)*/);
     QAction *exportZAct = new QAction(exportZIcon, tr("Export &Impedance"), this);
     QKeySequence exportZkey = QKeySequence(tr("Ctrl+I"));
     exportZAct->setShortcut(exportZkey);
@@ -271,7 +263,8 @@ void MainWindow::createActions()
     fileMenu->addAction(exportZAct);
     fileToolBar->addAction(exportZAct);
 
-    const QIcon exportTfIcon = /*QIcon::fromTheme("document-export",*/ QIcon(":/images/exportTf.png"/*)*/);
+    const QIcon exportTfIcon = /*QIcon::fromTheme("document-export",*/ QIcon(
+        ":/images/exportTf.png" /*)*/);
     QAction *exportTfAct = new QAction(exportTfIcon, tr("Export &Transfer Function"), this);
     QKeySequence exportTfkey = QKeySequence(tr("Ctrl+T"));
     exportTfAct->setShortcut(exportTfkey);
@@ -310,15 +303,11 @@ void MainWindow::createActions()
     //plotToolBar->addSeparator();
     plotToolBar->addWidget(impButton);
 
+    connect(delmEdit, SIGNAL(textChanged(QString)), this, SLOT(setDelimiter(QString)));
 
-    connect(delmEdit,SIGNAL(textChanged(QString)),
-            this,SLOT(setDelimiter(QString)));
+    connect(headerSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setHeadLen(int)));
 
-    connect(headerSpinBox,SIGNAL(valueChanged(int)),
-            this,SLOT(setHeadLen(int)));
-
-    connect(impButton,SIGNAL(clicked()),
-            this,SLOT(replotData()));
+    connect(impButton, SIGNAL(clicked()), this, SLOT(replotData()));
 
     fileMenu->addSeparator();
 
@@ -330,7 +319,6 @@ void MainWindow::createActions()
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
     aboutAct->setStatusTip(tr("Show the application's About box"));
-
 
     QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
@@ -348,27 +336,24 @@ void MainWindow::readSettings()
     if (geometry.isEmpty()) {
         const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
         resize(availableGeometry.width() * 3 / 8, availableGeometry.height() / 3);
-        move((availableGeometry.width() - width()) / 2,
-             (availableGeometry.height() - height()) / 2);
+        move((availableGeometry.width() - width()) / 2, (availableGeometry.height() - height()) / 2);
     } else {
         restoreGeometry(geometry);
     }
 
-        headerLen = settings.value("header ength", QVariant(static_cast<int>(1))).toInt();
+    headerLen = settings.value("header ength", QVariant(static_cast<int>(1))).toInt();
 
-        QByteArray ba;
-        ba = settings.value("csv delimiter", QVariant(static_cast<const char*>(";"))).toString().toLocal8Bit();
-        if(*ba.data()!=0)
-        {
-            delimiter = *ba.data();
-        }
-        else
-        {
-            delimiter = ';';
-        }
+    QByteArray ba;
+    ba = settings.value("csv delimiter", QVariant(static_cast<const char *>(";")))
+             .toString()
+             .toLocal8Bit();
+    if (*ba.data() != 0) {
+        delimiter = *ba.data();
+    } else {
+        delimiter = ';';
+    }
 
-        impedance = settings.value("plot type", QVariant(false)).toBool();
-
+    impedance = settings.value("plot type", QVariant(false)).toBool();
 }
 
 void MainWindow::writeSettings()
@@ -394,10 +379,9 @@ void MainWindow::replotData()
 
 void MainWindow::plotData()
 {
+    double re, im, mag, phase;
 
-    double re,im,mag,phase;
-
-    if(input_data.isEmpty())
+    if (input_data.isEmpty())
         return;
 
     QVector<QCPGraphData> dataMag, dataPha;
@@ -406,39 +390,38 @@ void MainWindow::plotData()
     double minpha = 0;
     double maxpha = 0;
 
-    for(int i=0;i<input_data.size();i++)
-    {
+    for (int i = 0; i < input_data.size(); i++) {
         re = input_data[i].real;
         im = input_data[i].imag;
 
-        mag   =  sqrt(re*re+im*im);
+        mag = sqrt(re * re + im * im);
 
-        if(!impedance && qIsNull(mag))
+        if (!impedance && qIsNull(mag))
             continue; //skip invalid data
 
-        phase =  qRadiansToDegrees(qAtan2(im,re));
+        phase = qRadiansToDegrees(qAtan2(im, re));
 
-        mag   = impedance ? mag : 20*log10(mag);
+        mag = impedance ? mag : 20 * log10(mag);
 
-        dataMag.append(QCPGraphData(input_data[i].freq,mag));
-        dataPha.append(QCPGraphData(input_data[i].freq,phase));
+        dataMag.append(QCPGraphData(input_data[i].freq, mag));
+        dataPha.append(QCPGraphData(input_data[i].freq, phase));
 
-        if(!i)
+        if (!i)
             minmag = mag;
-        if(!i)
+        if (!i)
             minpha = phase;
-        if(!i)
+        if (!i)
             maxmag = mag;
-        if(!i)
+        if (!i)
             maxpha = phase;
 
-        if(mag < minmag)
+        if (mag < minmag)
             minmag = mag;
-        if(phase < minpha)
+        if (phase < minpha)
             minpha = phase;
-        if(mag > maxmag)
+        if (mag > maxmag)
             maxmag = mag;
-        if(phase > maxpha)
+        if (phase > maxpha)
             maxpha = phase;
     }
 
@@ -448,21 +431,18 @@ void MainWindow::plotData()
     plot->graph(1)->setName(tr("phase"));
     plot->graph(1)->setPen(QPen(Qt::red));
 
-    plot->xAxis->setRange(dataMag.first().key,dataMag.last().key);
+    plot->xAxis->setRange(dataMag.first().key, dataMag.last().key);
     plot->yAxis->setLabel(impedance ? tr("Impedance [Ω]") : tr("Magnitude [dB]"));
     plot->yAxis->setScaleType(impedance ? QCPAxis::stLogarithmic : QCPAxis::stLinear);
 
-    if(impedance)
-    {
-        plot->yAxis->setRange(minmag/10,maxmag*10);
+    if (impedance) {
+        plot->yAxis->setRange(minmag / 10, maxmag * 10);
         QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
         plot->yAxis->setTicker(logTicker);
         plot->yAxis->setNumberFormat("eb");
         plot->yAxis->setNumberPrecision(0);
-    }
-    else
-    {
-        plot->yAxis->setRange(minmag-10,maxmag+10);
+    } else {
+        plot->yAxis->setRange(minmag - 10, maxmag + 10);
         QSharedPointer<QCPAxisTickerFixed> fixedTicker(new QCPAxisTickerFixed);
         fixedTicker->setTickStep(10.0);
         plot->yAxis->setTicker(fixedTicker);
@@ -470,9 +450,10 @@ void MainWindow::plotData()
         plot->yAxis->setNumberPrecision(0);
     }
 
-    plot->yAxis2->setRange(minpha-20,maxpha+20);
+    plot->yAxis2->setRange(minpha - 20, maxpha + 20);
     plot->legend->setVisible(true);
-    plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignLeft|Qt::AlignTop); // make legend align in top left corner or axis rect
+    plot->axisRect()->insetLayout()->setInsetAlignment(
+        0, Qt::AlignLeft | Qt::AlignTop); // make legend align in top left corner or axis rect
     plot->replot();
     statusBar()->showMessage(tr("Plot updated"), 2000);
 }
@@ -481,9 +462,10 @@ void MainWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this,
+                             tr("Application"),
                              tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
+                                 .arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return;
     }
 
@@ -491,36 +473,33 @@ void MainWindow::loadFile(const QString &fileName)
 
     int head = headerLen;
     while (!file.atEnd()) {
+        if (head) {
+            file.readLine();
+            head--;
+            continue;
+        }
 
-            if(head){
-                file.readLine();
-                head--;
+        QList<QByteArray> list = file.readLine().split(delimiter);
+        freim data;
+
+        if (list.size() > 2) {
+            bool success;
+            data.freq = list[0].toDouble(&success);
+            if (!success)
+                continue; //skip until next row
+            data.real = list[1].toDouble(&success);
+            if (!success)
                 continue;
-            }
+            data.imag = list[2].toDouble(&success);
+            if (!success)
+                continue;
 
-            QList<QByteArray>list = file.readLine().split(delimiter);
-            freim data;
-
-            if (list.size() > 2)
-            {
-                bool success;
-                data.freq = list[0].toDouble(&success);
-                if(!success) continue; //skip until next row
-                data.real = list[1].toDouble(&success);
-                if(!success) continue;
-                data.imag = list[2].toDouble(&success);
-                if(!success) continue;
-
-                input_data.append(data);
-            }
-            else
-            {
-                qDebug("too few columns\n");
-            }
-
+            input_data.append(data);
+        } else {
+            qDebug("too few columns\n");
+        }
     }
-    if(input_data.isEmpty())
-    {
+    if (input_data.isEmpty()) {
         statusBar()->showMessage(tr("Data not found"), 2000);
         return;
     }
@@ -529,7 +508,6 @@ void MainWindow::loadFile(const QString &fileName)
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
 }
-
 
 void MainWindow::setCurrentFile(const QString &fileName)
 {
