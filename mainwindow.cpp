@@ -217,10 +217,12 @@ void MainWindow::about()
     QMessageBox::about(this,
                        tr("About Application"),
                        tr("The <b>bode2spice</b> tool reads data "
-                          "from Comma Separated Values file, exported by the Omicron Labs "
-                          "Bode Analyzer Suite or similar source containing complex impedance "
-                          "or transfer function, plots it for inspection and generates "
-                          "LTSpice compatible component to ease embedding into simulation."));
+                          "from a Comma-Separated Values (CSV) file, exported by the Omicron Labs "
+                          "Bode Analyzer Suite or a similar source containing complex impedance "
+                          "or transfer function data. It plots the data for inspection"
+                          " and generates an LTSpice-compatible component "
+                          "to simplify embedding into simulations."));
+
 }
 
 void MainWindow::setDelimiter(const QString cdata)
@@ -334,7 +336,7 @@ void MainWindow::readSettings()
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
-        const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+        const QRect availableGeometry = QGuiApplication::primaryScreen()->geometry();
         resize(availableGeometry.width() * 3 / 8, availableGeometry.height() / 3);
         move((availableGeometry.width() - width()) / 2, (availableGeometry.height() - height()) / 2);
     } else {
@@ -361,7 +363,7 @@ void MainWindow::writeSettings()
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     settings.setValue("geometry", saveGeometry());
     settings.setValue("header ength", headerLen);
-    settings.setValue("csv delimiter", QVariant(&delimiter));
+    settings.setValue("csv delimiter", QChar(delimiter));
     settings.setValue("plot type", impedance);
 }
 
