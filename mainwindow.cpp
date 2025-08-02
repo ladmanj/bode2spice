@@ -219,9 +219,10 @@ void MainWindow::about()
                        tr("The <b>bode2spice</b> tool reads data "
                           "from a Comma-Separated Values (CSV) file, exported by the Omicron Labs "
                           "Bode Analyzer Suite or a similar source containing complex impedance "
-                          "or transfer function data. It plots the data for inspection"
+                          "or transfer function data.<br>It plots the data for inspection"
                           " and generates an LTSpice-compatible component "
-                          "to simplify embedding into simulations."));
+                          "to simplify embedding into simulations."
+                          "<br>Check new versions at <a href=\"https://github.com/ladmanj/bode2spice\">https://github.com/ladmanj/bode2spice</a>"));
 
 }
 
@@ -343,10 +344,10 @@ void MainWindow::readSettings()
         restoreGeometry(geometry);
     }
 
-    headerLen = settings.value("header ength", QVariant(static_cast<int>(1))).toInt();
+    headerLen = settings.value("header_len", QVariant(static_cast<int>(1))).toInt();
 
     QByteArray ba;
-    ba = settings.value("csv delimiter", QVariant(static_cast<const char *>(";")))
+    ba = settings.value("delimiter", QVariant(static_cast<const char *>(";")))
              .toString()
              .toLocal8Bit();
     if (*ba.data() != 0) {
@@ -355,16 +356,16 @@ void MainWindow::readSettings()
         delimiter = ';';
     }
 
-    impedance = settings.value("plot type", QVariant(false)).toBool();
+    impedance = settings.value("impedance_plot", QVariant(false)).toBool();
 }
 
 void MainWindow::writeSettings()
 {
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     settings.setValue("geometry", saveGeometry());
-    settings.setValue("header ength", headerLen);
-    settings.setValue("csv delimiter", QChar(delimiter));
-    settings.setValue("plot type", impedance);
+    settings.setValue("header_len", headerLen);
+    settings.setValue("delimiter", QChar(delimiter));
+    settings.setValue("impedance_plot", impedance);
 }
 
 bool MainWindow::maybeSave()
@@ -518,6 +519,6 @@ void MainWindow::setCurrentFile(const QString &fileName)
 
     QString shownName = curFile;
     if (curFile.isEmpty())
-        shownName = tr("untitled.txt");
+        shownName = tr("bode2spice");
     setWindowFilePath(shownName);
 }
