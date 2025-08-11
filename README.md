@@ -1,11 +1,10 @@
 # bode2spice
 The <b>bode2spice</b> tool reads data from Comma Separated Values file, exported by the Omicron Labs Bode Analyzer Suite or similar source, containing complex impedance or transfer function, plots it for inspection and generates LTSpice compatible component to ease embedding into simulation.
 
-For a Windows binary go to the releases to the right here on github.
+For a Windows binary go to the releases to the right here on github. Everyone else must build it from sources.
 
-It uses Qt5 https://www.qt.io/ and QCustomplot https://www.qcustomplot.com/ libraries.
+It uses Qt (5 or 6) https://www.qt.io/ and QCustomplot https://www.qcustomplot.com/ libraries.
 
-Everyone else must build it from sources.
 
 Qt must be installed on your system as a prerequisite, QCustomplot sources are included here.
 
